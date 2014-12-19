@@ -7,6 +7,7 @@ var set          = require('./set');
 var BASE_URL     = process.env['BASE_URL'];
 
 (function startScraping() {
+  console.log('starting scraping of ' + BASE_URL);
   doScrape([BASE_URL], set.create(), set.create());
 }());
 
@@ -31,7 +32,7 @@ function doScrape(LINKS, LINKS_VISITED, BROKEN_LINKS) {
 }
 
 function printResults(LINKS_VISITED, BROKEN_LINKS) {
-  console.log('scraping done');
+  console.log('scraping complete. \n links_visited are: ');
   console.log(LINKS_VISITED);
   console.log('broken links are');
   console.log(BROKEN_LINKS);
@@ -49,7 +50,6 @@ function scrapeFrom(selfHostedUrl, LINKS_VISITED, cb) {
   }
   request(fullUrl, function(err, res, body) {
     if(err || res.statusCode !== 200) {
-      console.error('ERROR fetching url ' + selfHostedUrl + " err " + err + ' status_code ' + res.statusCode);
       cb(true, []);
       return;
     }
@@ -72,6 +72,9 @@ function extractLinksFrom(body, LINKS_VISITED, cb) {
         return link[0]  === '/';
       }).reject(function(link) {
         return link.substring(0, 2) === '//';
+      }).reject(function(link) {
+        //HACK -- Figure out how to clean this
+        return link.indexOf('broken-links/index.js') >= 0;
       }).value();
       cb(linksThatAreSelfHosted);
       return;
