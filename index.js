@@ -15,19 +15,11 @@ function doScrape(LINKS, LINKS_VISITED, BROKEN_LINKS) {
     printResults(LINKS_VISITED, BROKEN_LINKS);
     return;
   }
-  console.log('BROKEN_LINKS');
-  console.log(BROKEN_LINKS);
   var url = LINKS.pop();
   if(set.isInSet(LINKS_VISITED, url)) {
-    console.log('skipping url ' + url);
     doScrape(LINKS, LINKS_VISITED, BROKEN_LINKS);
     return;
   }
-  console.log('looking at url ' + url);
-  console.log('LINKS is ');
-  console.log(LINKS);
-  console.log('LINKS_VISITED is ');
-  console.log(LINKS_VISITED);
   scrapeFrom(url, LINKS_VISITED, function(isBroken, links) {
     if(isBroken) {
       doScrape(LINKS.concat(links), set.addToSet(LINKS_VISITED, url), set.addToSet(BROKEN_LINKS, url));
@@ -46,18 +38,22 @@ function printResults(LINKS_VISITED, BROKEN_LINKS) {
   process.exit(0);
 }
 
-function scrapeFrom(url, LINKS_VISITED, cb) {
-  var fullUrl = url;
-  if (url.substring(0, BASE_URL.length) !== BASE_URL) {
-    fullUrl = BASE_URL + url;
+function isRelativeUrl(url) {
+  return url.substring(0, BASE_URL.length) !== BASE_URL;
+}
+
+function scrapeFrom(selfHostedUrl, LINKS_VISITED, cb) {
+  var fullUrl = selfHostedUrl;
+  if (isRelativeUrl(selfHostedUrl)) {
+    fullUrl = BASE_URL + selfHostedUrl;
   }
   request(fullUrl, function(err, res, body) {
     if(err || res.statusCode !== 200) {
-      console.error('ERROR fetching url ' + url + " err " + err + ' status_code ' + res.statusCode);
+      console.error('ERROR fetching url ' + selfHostedUrl + " err " + err + ' status_code ' + res.statusCode);
       cb(true, []);
       return;
     }
-    extractLinksFrom(url, LINKS_VISITED, function(links) {
+    extractLinksFrom(fullUrl, LINKS_VISITED, function(links) {
       cb(false, links);
       return;
     });
