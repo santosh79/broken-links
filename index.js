@@ -53,21 +53,27 @@ function scrapeFrom(selfHostedUrl, LINKS_VISITED, cb) {
       cb(true, []);
       return;
     }
-    extractLinksFrom(fullUrl, LINKS_VISITED, function(links) {
+    extractLinksFrom(body, LINKS_VISITED, function(links) {
       cb(false, links);
       return;
     });
   });
 }
 
-function extractLinksFrom(url, LINKS_VISITED, cb) {
+function extractLinksFrom(body, LINKS_VISITED, cb) {
   jsdom.env(
-    url,
+    body,
     ["http://code.jquery.com/jquery.js"],
     function (errors, window) {
       var allResourceLinks       = getAllResourcesInPage(window);
-      var linksThatAreSelfHosted = _.chain(allResourceLinks).filter(function(link) {
-        return link.substring(0, BASE_URL.length) === BASE_URL || link[0]  === '/';
+      var linksThatAreSelfHosted = _.chain(allResourceLinks).map(function(link) {
+        if(link.substring(0, "file://".length) === "file://") {
+          return link.substring("file://".length);
+        } else {
+          return link;
+        }
+      }).filter(function(link) {
+        return link[0]  === '/';
       }).reject(function(link) {
         return link.substring(0, 2) === '//';
       }).value();
