@@ -67,11 +67,7 @@ function extractLinksFrom(body, LINKS_VISITED, cb) {
     function (errors, window) {
       var allResourceLinks       = getAllResourcesInPage(window);
       var linksThatAreSelfHosted = _.chain(allResourceLinks).map(function(link) {
-        if(link.substring(0, "file://".length) === "file://") {
-          return link.substring("file://".length);
-        } else {
-          return link;
-        }
+        return link.replace(/^file:\/\//, "");
       }).filter(function(link) {
         return link[0]  === '/';
       }).reject(function(link) {
