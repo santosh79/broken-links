@@ -2,7 +2,6 @@
 var jsdom        = require("jsdom");
 var request      = require("request");
 var _            = require("underscore");
-var set          = require('./set');
 var BASE_URL     = "";
 
 if (process.argv.length !== 3) {
@@ -14,13 +13,12 @@ if (process.argv.length !== 3) {
 
 (function startScraping() {
   console.log('starting scraping of ' + BASE_URL);
-  var links = set.create();
-  links = set.addToSet(links, BASE_URL);
-  doScrape(links, set.create(), set.create());
+  var links = [BASE_URL];
+  doScrape(links, [], []);
 }());
 
 function doScrape(LINKS, LINKS_VISITED, BROKEN_LINKS) {
-  var urlsToScrape = set.difference(LINKS, LINKS_VISITED);
+  var urlsToScrape = _.difference(LINKS, LINKS_VISITED);
 
   if (urlsToScrape.length === 0) {
     printResults(LINKS_VISITED, BROKEN_LINKS);
@@ -31,11 +29,11 @@ function doScrape(LINKS, LINKS_VISITED, BROKEN_LINKS) {
   var linksVisited = LINKS_VISITED;
   _.each(urlsToScrape, function(url) {
     scrapeFrom(url, LINKS_VISITED, function(isBroken, links) {
-      linksVisited = set.addToSet(linksVisited, url);
+      linksVisited = linksVisited.concat([url]);
       if(isBroken) {
-        brokenLinks = set.addToSet(brokenLinks, url);
+        brokenLinks = brokenLinks.concat([url]);
       }
-      LINKS = set.union(LINKS, links);
+      LINKS = _.union(LINKS, links);
       if(--pending === 0) {
         doScrape(LINKS, linksVisited, brokenLinks);
       }
