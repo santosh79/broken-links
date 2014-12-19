@@ -73,11 +73,7 @@ function extractLinksFrom(body, LINKS_VISITED, cb) {
       }).reject(function(link) {
         return link.substring(0, 2) === '//';
       }).value();
-
-      var linksNotVisited = _.filter(linksThatAreSelfHosted, function(link) {
-        return set.isNotInSet(LINKS_VISITED, link);
-      });
-      cb(linksNotVisited);
+      cb(linksThatAreSelfHosted);
       return;
     }
   );
