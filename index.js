@@ -16,26 +16,34 @@ if (process.argv.length !== 3) {
 
 (function startScraping() {
   console.log('starting scraping of ' + BASE_URL);
-  doScrape([BASE_URL], set.create(), set.create());
+  var links = set.create();
+  links = set.addToSet(links, BASE_URL);
+  doScrape(links, set.create(), set.create());
 }());
 
 function doScrape(LINKS, LINKS_VISITED, BROKEN_LINKS) {
-  if (LINKS.length === 0) {
+  var urlsToScrape = set.difference(LINKS, LINKS_VISITED);
+
+  if (urlsToScrape.length === 0) {
     printResults(LINKS_VISITED, BROKEN_LINKS);
     return;
   }
-  var url = LINKS.pop();
-  if(set.isInSet(LINKS_VISITED, url)) {
-    doScrape(LINKS, LINKS_VISITED, BROKEN_LINKS);
-    return;
-  }
-  scrapeFrom(url, LINKS_VISITED, function(isBroken, links) {
-    if(isBroken) {
-      doScrape(LINKS.concat(links), set.addToSet(LINKS_VISITED, url), set.addToSet(BROKEN_LINKS, url));
-    } else {
-      doScrape(LINKS.concat(links), set.addToSet(LINKS_VISITED, url), BROKEN_LINKS);
-    }
-    return;
+  var pending      = urlsToScrape.length;
+  var brokenLinks  = BROKEN_LINKS;
+  var linksVisited = LINKS_VISITED;
+  _.each(urlsToScrape, function(url) {
+    console.log('scraping url ' + url);
+    scrapeFrom(url, LINKS_VISITED, function(isBroken, links) {
+      linksVisited = set.addToSet(linksVisited, url);
+      if(isBroken) {
+        brokenLinks = set.addToSet(brokenLinks, url);
+      }
+      LINKS = set.union(LINKS, links);
+      if(--pending === 0) {
+        doScrape(LINKS, linksVisited, brokenLinks);
+      }
+      return;
+    });
   });
 }
 

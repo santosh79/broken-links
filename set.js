@@ -23,3 +23,12 @@ function isNotInSet(set, element) {
 }
 exports.isNotInSet = isNotInSet;
 
+function difference(set, otherSet) {
+  return _.difference(set, otherSet);
+}
+exports.difference = difference;
+
+function union(set, otherSet) {
+  return _.union(set, otherSet);
+}
+exports.union = union;
