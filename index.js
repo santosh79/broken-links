@@ -1,7 +1,5 @@
 #! /usr/bin/env node
 var jsdom        = require("jsdom");
-var fs           = require('fs');
-var path         = require('path');
 var request      = require("request");
 var _            = require("underscore");
 var set          = require('./set');
