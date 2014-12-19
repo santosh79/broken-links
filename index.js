@@ -5,21 +5,22 @@ var request      = require("request");
 var _            = require("underscore");
 var set          = require('./set');
 var BASE_URL     = process.env['BASE_URL'];
-var BROKEN_LINKS = [];
 
 (function startScraping() {
-  doScrape([BASE_URL], set.create());
+  doScrape([BASE_URL], set.create(), set.create());
 }());
 
-function doScrape(LINKS, LINKS_VISITED) {
+function doScrape(LINKS, LINKS_VISITED, BROKEN_LINKS) {
   if (LINKS.length === 0) {
-    printResults(LINKS_VISITED);
+    printResults(LINKS_VISITED, BROKEN_LINKS);
     return;
   }
+  console.log('BROKEN_LINKS');
+  console.log(BROKEN_LINKS);
   var url = LINKS.pop();
   if(set.isInSet(LINKS_VISITED, url)) {
     console.log('skipping url ' + url);
-    doScrape(LINKS, LINKS_VISITED);
+    doScrape(LINKS, LINKS_VISITED, BROKEN_LINKS);
     return;
   }
   console.log('looking at url ' + url);
@@ -27,21 +28,25 @@ function doScrape(LINKS, LINKS_VISITED) {
   console.log(LINKS);
   console.log('LINKS_VISITED is ');
   console.log(LINKS_VISITED);
-  scrapeFrom(url, LINKS_VISITED, function(links) {
-    doScrape(LINKS.concat(links), set.addToSet(LINKS_VISITED, url));
+  scrapeFrom(url, LINKS_VISITED, function(isBroken, links) {
+    if(isBroken) {
+      doScrape(LINKS.concat(links), set.addToSet(LINKS_VISITED, url), set.addToSet(BROKEN_LINKS, url));
+    } else {
+      doScrape(LINKS.concat(links), set.addToSet(LINKS_VISITED, url), BROKEN_LINKS);
+    }
     return;
   });
 }
 
-function printResults(LINKS_VISITED) {
+function printResults(LINKS_VISITED, BROKEN_LINKS) {
   console.log('scraping done');
   console.log(LINKS_VISITED);
   console.log('broken links are');
-  console.log(_.uniq(BROKEN_LINKS));
+  console.log(BROKEN_LINKS);
   process.exit(0);
 }
 
-function scrapeFrom(url, LINKS_VISITED,  cb) {
+function scrapeFrom(url, LINKS_VISITED, cb) {
   var fullUrl = url;
   if (url.substring(0, BASE_URL.length) !== BASE_URL) {
     fullUrl = BASE_URL + url;
@@ -49,12 +54,11 @@ function scrapeFrom(url, LINKS_VISITED,  cb) {
   request(fullUrl, function(err, res, body) {
     if(err || res.statusCode !== 200) {
       console.error('ERROR fetching url ' + url + " err " + err + ' status_code ' + res.statusCode);
-      BROKEN_LINKS.push(url);
-      cb([]);
+      cb(true, []);
       return;
     }
     extractLinksFrom(url, LINKS_VISITED, function(links) {
-      cb(links);
+      cb(false, links);
       return;
     });
   });
