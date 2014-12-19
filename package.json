@@ -1,23 +1,26 @@
 {
+  "author": "Santosh Kumar <santosh79@gmail.com> (https://github.com/santosh79)",
   "name": "broken-links",
-  "version": "0.1.2",
-  "description": "A sample Node.js app",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js"
+  "description": "A Node.js library that finds broken links given a URL",
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/santosh79/broken-links"
   },
+  "engines": {
+    "node": "0.10.x"
+  },
+  "preferGlobal": "true",
+  "bin": { "broken-links": "./index.js" },
   "dependencies": {
     "jsdom" : "^ 1.5.0",
     "request" : "^ 2.51.0",
     "underscore" : "^ 1.7.0"
   },
-  "engines": {
-    "node": "0.10.x"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/heroku/node-js-getting-started"
-  },
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "homepage": "https://github.com/santosh79/traffic_cop",
+  "main": "index.js",
   "keywords": [
     "node",
     "heroku"

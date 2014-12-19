@@ -1,10 +1,18 @@
+#! /usr/bin/env node
 var jsdom        = require("jsdom");
 var fs           = require('fs');
 var path         = require('path');
 var request      = require("request");
 var _            = require("underscore");
 var set          = require('./set');
-var BASE_URL     = process.env['BASE_URL'];
+var BASE_URL     = "";
+
+if (process.argv.length !== 3) {
+  console.log('Usage: broken-link <URL>');
+  process.exit(0);
+} else {
+  BASE_URL = process.argv[2];
+}
 
 (function startScraping() {
   console.log('starting scraping of ' + BASE_URL);
