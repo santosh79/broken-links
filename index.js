@@ -65,12 +65,7 @@ function extractLinksFrom(url, LINKS_VISITED, cb) {
     url,
     ["http://code.jquery.com/jquery.js"],
     function (errors, window) {
-      var allAnchorTagsInPage = _.uniq(_.map(window.$("a"), function(link) { return link['href']; }));
-      var allImageTags        = _.uniq(_.map(window.$("img"), function(link) { return link['src']; }));
-      var allLinkTags         = _.uniq(_.map(window.$("link"), function(link) { return link['href']; }));
-      var allScriptTags       = _.uniq(_.map(window.$("script"), function(link) { return link['src']; }));
-      var linksAndScriptTags = allLinkTags.concat(allScriptTags);
-      var allResourceLinks    = allAnchorTagsInPage.concat(allImageTags).concat(linksAndScriptTags);
+      var allResourceLinks       = getAllResourcesInPage(window);
       var linksThatAreSelfHosted = _.chain(allResourceLinks).filter(function(link) {
         return link.substring(0, BASE_URL.length) === BASE_URL || link[0]  === '/';
       }).reject(function(link) {
@@ -84,4 +79,14 @@ function extractLinksFrom(url, LINKS_VISITED, cb) {
       return;
     }
   );
+}
+
+function getAllResourcesInPage(window) {
+  var allAnchorTagsInPage = _.uniq(_.map(window.$("a"), function(link) { return link['href']; }));
+  var allImageTags        = _.uniq(_.map(window.$("img"), function(link) { return link['src']; }));
+  var allLinkTags         = _.uniq(_.map(window.$("link"), function(link) { return link['href']; }));
+  var allScriptTags       = _.uniq(_.map(window.$("script"), function(link) { return link['src']; }));
+  var linksAndScriptTags  = allLinkTags.concat(allScriptTags);
+  var allResourceLinks    = allAnchorTagsInPage.concat(allImageTags).concat(linksAndScriptTags);
+  return allResourceLinks;
 }
