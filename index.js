@@ -83,10 +83,9 @@ function extractLinksFrom(url, LINKS_VISITED, cb) {
 
 function getAllResourcesInPage(window) {
   var allAnchorTagsInPage = _.uniq(_.map(window.$("a"), function(link) { return link['href']; }));
-  var allImageTags        = _.uniq(_.map(window.$("img"), function(link) { return link['src']; }));
   var allLinkTags         = _.uniq(_.map(window.$("link"), function(link) { return link['href']; }));
   var allScriptTags       = _.uniq(_.map(window.$("script"), function(link) { return link['src']; }));
   var linksAndScriptTags  = allLinkTags.concat(allScriptTags);
-  var allResourceLinks    = allAnchorTagsInPage.concat(allImageTags).concat(linksAndScriptTags);
+  var allResourceLinks    = allAnchorTagsInPage.concat(linksAndScriptTags);
   return allResourceLinks;
 }
