@@ -3,49 +3,35 @@ var fs           = require('fs');
 var path         = require('path');
 var request      = require("request");
 var _            = require("underscore");
+var set          = require('./set');
 var BASE_URL     = process.env['BASE_URL'];
 var BROKEN_LINKS = [];
 
-function addToSet(set, element) {
-  return _.chain(set).reject(function(el) {
-    return el === element;
-  }).concat([element]).value();
-}
-
-function isInSet(set, element) {
-  return !!(_.find(set, function(el) {
-    return el === element;
-  }));
-}
-
-function isNotInSet(set, element) {
-  return !isInSet(set, element);
-}
-
 (function startScraping() {
-  var doScrape = function(LINKS, LINKS_VISITED) {
-    if (LINKS.length === 0) {
-      printResults(LINKS_VISITED);
-      return;
-    }
-    var url = LINKS.pop();
-    if(isInSet(LINKS_VISITED, url)) {
-      console.log('skipping url ' + url);
-      doScrape(LINKS, LINKS_VISITED);
-      return;
-    }
-    console.log('looking at url ' + url);
-    console.log('LINKS is ');
-    console.log(LINKS);
-    console.log('LINKS_VISITED is ');
-    console.log(LINKS_VISITED);
-    scrapeFrom(url, LINKS_VISITED, function(links) {
-      doScrape(LINKS.concat(links), addToSet(LINKS_VISITED, url));
-      return;
-    });
-  };
-  doScrape([BASE_URL], {});
+  doScrape([BASE_URL], set.create());
 }());
+
+function doScrape(LINKS, LINKS_VISITED) {
+  if (LINKS.length === 0) {
+    printResults(LINKS_VISITED);
+    return;
+  }
+  var url = LINKS.pop();
+  if(set.isInSet(LINKS_VISITED, url)) {
+    console.log('skipping url ' + url);
+    doScrape(LINKS, LINKS_VISITED);
+    return;
+  }
+  console.log('looking at url ' + url);
+  console.log('LINKS is ');
+  console.log(LINKS);
+  console.log('LINKS_VISITED is ');
+  console.log(LINKS_VISITED);
+  scrapeFrom(url, LINKS_VISITED, function(links) {
+    doScrape(LINKS.concat(links), set.addToSet(LINKS_VISITED, url));
+    return;
+  });
+}
 
 function printResults(LINKS_VISITED) {
   console.log('scraping done');
@@ -92,7 +78,7 @@ function extractLinksFrom(url, LINKS_VISITED, cb) {
       }).value();
 
       var linksNotVisited = _.filter(linksThatAreSelfHosted, function(link) {
-        return isNotInSet(LINKS_VISITED, link);
+        return set.isNotInSet(LINKS_VISITED, link);
       });
       cb(linksNotVisited);
       return;
