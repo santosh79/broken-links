@@ -32,7 +32,6 @@ function doScrape(LINKS, LINKS_VISITED, BROKEN_LINKS) {
   var brokenLinks  = BROKEN_LINKS;
   var linksVisited = LINKS_VISITED;
   _.each(urlsToScrape, function(url) {
-    console.log('scraping url ' + url);
     scrapeFrom(url, LINKS_VISITED, function(isBroken, links) {
       linksVisited = set.addToSet(linksVisited, url);
       if(isBroken) {

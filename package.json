@@ -2,7 +2,7 @@
   "author": "Santosh Kumar <santosh79@gmail.com> (https://github.com/santosh79)",
   "name": "find-broken-links",
   "description": "A Node.js library that finds broken links given a URL",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "repository": {
     "type": "git",
     "url": "https://github.com/santosh79/broken-links"
