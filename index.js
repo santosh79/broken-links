@@ -4,8 +4,7 @@ var path          = require('path');
 var request       = require("request");
 var _             = require("underscore");
 var SITE_DIR      = "./site";
-// var BASE_URL      = "http://localhost:8080";
-var BASE_URL      = "http://do";
+var BASE_URL      = process.env['BASE_URL'];
 var LINKS_VISITED = {};
 var BROKEN_LINKS = [];
 
