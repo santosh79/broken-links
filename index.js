@@ -83,9 +83,12 @@ function extractLinksFrom(body, LINKS_VISITED, cb) {
         return link[0]  === '/';
       }).reject(function(link) {
         return link.substring(0, 2) === '//';
-      }).reject(function(link) {
-        //HACK -- Figure out how to clean this
-        return link.indexOf('broken-links/index.js') >= 0;
+      }).map(function(link) {
+        if (link.indexOf('broken-links') > 0) {
+          return link.substring(link.indexOf('broken-links')).replace(/^broken-links/,"");
+        } else {
+          return link;
+        }
       }).value();
       cb(linksThatAreSelfHosted);
       return;
