@@ -43,11 +43,15 @@ function doScrape(LINKS, LINKS_VISITED, BROKEN_LINKS) {
 }
 
 function printResults(LINKS_VISITED, BROKEN_LINKS) {
-  console.log('scraping complete. \n links_visited are: ');
-  console.log(LINKS_VISITED);
-  console.log('broken links are');
-  console.log(BROKEN_LINKS);
-  process.exit(0);
+  function formatResults(urls) {
+    return urls.sort().map(function(url) {return "  " + url}).join("\n")
+  }
+
+  console.log('scraping complete. \nlinks_visited are:\n');
+  console.log(formatResults(LINKS_VISITED));
+  console.log('broken links are:\n');
+  console.log(formatResults(BROKEN_LINKS));
+  process.exit(BROKEN_LINKS.length == 0 ? 0 : 1);
 }
 
 function isRelativeUrl(url) {
